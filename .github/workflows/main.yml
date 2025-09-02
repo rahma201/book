@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4   # تحديث checkout
+        uses: actions/checkout@v4
 
       - name: Install Python3, pip, venv and build tools
         run: |
@@ -33,7 +33,7 @@ jobs:
           tar -czf artifacts/app.tgz -C . .
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4   # تحديث إلى v4
+        uses: actions/upload-artifact@v4
         with:
           name: app-package
           path: artifacts/app.tgz
@@ -44,16 +44,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4   # تحديث checkout
+        uses: actions/checkout@v4
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@v3   # تحديث إلى v3
+        uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.DOCKER_USERNAME }}   # مطابق مع secrets بالصورة
+          password: ${{ secrets.DOCKER_PASSWORD }}   # مطابق مع secrets بالصورة
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5   # تحديث إلى v5
+        uses: docker/build-push-action@v5
         with:
           context: ./book-shop
           file: ./book-shop/dockerfile
@@ -68,9 +68,9 @@ jobs:
       - name: SSH into Blue VM and deploy
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USER }}
-          key: ${{ secrets.VM_SSH_KEY }}
+          host: ${{ secrets.SERVER_IP }}        # مطابق مع secrets بالصورة
+          username: ${{ secrets.SERVER_USER }}  # مطابق مع secrets بالصورة
+          key: ${{ secrets.SERVER_SSH_KEY }}    # مطابق مع secrets بالصورة
           script: |
             echo "Stopping old Django container if running..."
             docker rm -f djangoapp || true

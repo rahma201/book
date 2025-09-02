@@ -56,7 +56,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./book-shop
-          file: ./book-shop/dockerfile
+          file: ./book-shop/Dockerfile
           push: true
           tags: ${{ env.IMAGE_NAME }}:${{ env.TAG }}
 

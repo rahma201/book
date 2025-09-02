@@ -1,27 +1,33 @@
-# Base image
-FROM python:3.11-slim
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
+# Use the official Python runtime image
+FROM python:3.10-slim
+ 
+# Create the app directory
+RUN mkdir /app
+ 
+# Set the working directory inside the container
 WORKDIR /app
-
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpq-dev \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN pip install --upgrade pip && pip install poetry
-
-COPY pyproject.toml poetry.lock* /app/
-RUN poetry install --no-root --only main
-
+ 
+# Set environment variables 
+# Prevents Python from writing pyc files to disk
+ENV PYTHONDONTWRITEBYTECODE=1
+#Prevents Python from buffering stdout and stderr
+ENV PYTHONUNBUFFERED=1 
+ 
+# Upgrade pip
+RUN pip install --upgrade pip 
+ 
+# Copy the Django project  and install dependencies
+COPY requirements.txt  /app/
+ 
+# run this command to install all dependencies 
+RUN pip install --no-cache-dir -r requirements.txt
+ 
+# Copy the Django project to the container
 COPY . /app/
-
-# 🔹 removed collectstatic step since no static files
-# RUN poetry run python manage.py collectstatic --noinput
-
-EXPOSE 80
-
-CMD ["poetry", "run", "gunicorn", "--bind", "0.0.0.0:80", "book_shop.wsgi:application"]
+ 
+# Expose the Django port
+EXPOSE 8000
+ 
+# Run Django’s development server
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
